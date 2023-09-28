@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import *
 import numpy as np
 import cv2
 
+
 @final
 class PixusView(QWidget):
     def __init__(self, bot_model: BotWorker):

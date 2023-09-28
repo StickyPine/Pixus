@@ -5,6 +5,7 @@ from windows import WindowManagerAbstract
 from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
 from typing import *
 
+
 @final
 class BotWorker(QThread):
 
