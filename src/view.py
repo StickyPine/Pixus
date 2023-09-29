@@ -1,7 +1,7 @@
 from typing import *
 from bot_worker import BotWorker
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal
 import numpy as np
 from pynput import keyboard
 import cv2
@@ -53,6 +53,7 @@ class PixusView(QWidget):
         else:
             self.debug_button.setText('Debug_off')
             self.__bot_worker.debug_window = False
+
 
 class KeyListener(QThread):
 
