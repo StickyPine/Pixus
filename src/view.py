@@ -1,7 +1,9 @@
 from typing import *
 from bot_worker import BotWorker
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
 import numpy as np
+from pynput import keyboard
 import cv2
 
 
@@ -9,9 +11,12 @@ import cv2
 class PixusView(QWidget):
     def __init__(self, bot_model: BotWorker):
         super().__init__()
+        self.__key_listener = KeyListener()
+        self.__key_listener.start()
+        self.__key_listener.stop_key_signal.connect(self.__toggle_start_stop)
         self.__bot_worker = bot_model
         self.__bot_worker.start()
-        self.__bot_worker.displayImageSignal.connect(self.__display_image)
+        self.__bot_worker.display_image_signal.connect(self.__display_image)
 
         self.__init_ui()
 
@@ -48,3 +53,20 @@ class PixusView(QWidget):
         else:
             self.debug_button.setText('Debug_off')
             self.__bot_worker.debug_window = False
+
+class KeyListener(QThread):
+
+    stop_key_signal = pyqtSignal()
+
+    def run(self):
+        with keyboard.Listener(on_press=self.on_press) as listener:
+            listener.join()
+
+    def on_press(self, key):
+        try:
+            if key == keyboard.Key.f1:
+                print("F1 pressed")
+                self.stop_key_signal.emit()
+        except AttributeError:
+            pass
+
