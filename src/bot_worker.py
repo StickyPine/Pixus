@@ -21,7 +21,7 @@ class BotWorker(QThread):
         self.__WIDTH = 1024
 
         self.wm = window_manager
-        self.debug_window = False
+        self.__debug_window = False
 
         self.__model = YOLO(model_detection_path)
         self.__threshold = 0.75
@@ -46,6 +46,12 @@ class BotWorker(QThread):
                                           cv2.BORDER_CONSTANT, value=[0, 0, 0])
         resized_image = cv2.resize(padded_image, (self.__WIDTH, self.__HEIGTH))
         return resized_image
+
+    def debug_window_on(self):
+        self.__debug_window = True
+
+    def debug_window_off(self):
+        self.__debug_window = False
 
     def pause(self) -> None:
         self.__mutex.lock()
@@ -76,8 +82,8 @@ class BotWorker(QThread):
                 class_name = results.names[int(class_id)]
 
                 if score > self.__threshold:
-                    if self.debug_window:
+                    if self.__debug_window:
                         self.__draw_boxe(img, x1, x2, y1, y2, class_name)
 
-            if self.debug_window:
+            if self.__debug_window:
                 self.display_image_signal.emit(img, "Pixus Debug")

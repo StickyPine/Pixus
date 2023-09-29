@@ -49,10 +49,10 @@ class PixusView(QWidget):
     def __toggle_debug(self):
         if self.debug_button.text() == 'Debug_off':
             self.debug_button.setText('Debug_on')
-            self.__bot_worker.debug_window = True
+            self.__bot_worker.debug_window_on()
         else:
             self.debug_button.setText('Debug_off')
-            self.__bot_worker.debug_window = False
+            self.__bot_worker.debug_window_off()
 
 @final
 class KeyListener(QThread):
