@@ -9,7 +9,7 @@ from typing import *
 @final
 class BotWorker(QThread):
 
-    displayImageSignal = pyqtSignal(np.ndarray, str)
+    display_image_signal = pyqtSignal(np.ndarray, str)
 
     def __init__(self, window_manager: WindowManagerAbstract,
                  model_detection_path: str):
@@ -17,6 +17,8 @@ class BotWorker(QThread):
         self.__wait_condition = QWaitCondition()
         self.__mutex = QMutex()
         self.__paused = True
+        self.__HEIGTH = 960
+        self.__WIDTH = 1024
 
         self.wm = window_manager
         self.debug_window = False
@@ -31,6 +33,19 @@ class BotWorker(QThread):
         cv2.putText(img, class_name.upper(),
                     (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX,
                     1.3, (0, 255, 0), 3, cv2.LINE_AA)
+
+    def __resize_image(self, img):
+        h, w, _ = img.shape
+        longest_edge = max(h, w)
+        top_padding = (longest_edge - h) // 2
+        bottom_padding = longest_edge - h - top_padding
+        left_padding = (longest_edge - w) // 2
+        right_padding = longest_edge - w - left_padding
+        padded_image = cv2.copyMakeBorder(img, top_padding, bottom_padding,
+                                          left_padding, right_padding,
+                                          cv2.BORDER_CONSTANT, value=[0, 0, 0])
+        resized_image = cv2.resize(padded_image, (self.__WIDTH, self.__HEIGTH))
+        return resized_image
 
     def pause(self) -> None:
         self.__mutex.lock()
@@ -51,10 +66,13 @@ class BotWorker(QThread):
             self.__mutex.unlock()
 
             img = self.wm.get_window_array()
+            img = self.__resize_image(img)
             results = self.__model(img)[0]
 
             for result in results.boxes.data.tolist():
                 x1, y1, x2, y2, score, class_id = result
+                center_x = x2 - x1 // 2
+                center_y = y2 - y1 // 2
                 class_name = results.names[int(class_id)]
 
                 if score > self.__threshold:
@@ -62,4 +80,4 @@ class BotWorker(QThread):
                         self.__draw_boxe(img, x1, x2, y1, y2, class_name)
 
             if self.debug_window:
-                self.displayImageSignal.emit(img, "Pixus Debug")
+                self.display_image_signal.emit(img, "Pixus Debug")
