@@ -54,16 +54,16 @@ class PixusView(QWidget):
             self.debug_button.setText('Debug_off')
             self.__bot_worker.debug_window = False
 
-
+@final
 class KeyListener(QThread):
 
     stop_key_signal = pyqtSignal()
 
     def run(self):
-        with keyboard.Listener(on_press=self.on_press) as listener:
+        with keyboard.Listener(on_press=self.__on_press) as listener:
             listener.join()
 
-    def on_press(self, key):
+    def __on_press(self, key):
         try:
             if key == keyboard.Key.f1:
                 print("F1 pressed")
