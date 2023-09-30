@@ -29,12 +29,15 @@ class PixusView(QWidget):
 
         self.start_button = QPushButton('Start', self)
         self.debug_button = QPushButton('Debug_off', self)
+        self.resize_button = QPushButton("Resize window", self)
 
         self.layout.addWidget(self.start_button)
         self.layout.addWidget(self.debug_button)
+        self.layout.addWidget(self.resize_button)
 
         self.start_button.clicked.connect(self.__toggle_start_stop)
         self.debug_button.clicked.connect(self.__toggle_debug)
+        self.resize_button.clicked.connect(self.__bot_worker.resize_window)
 
         self.setLayout(self.layout)
 

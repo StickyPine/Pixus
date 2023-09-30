@@ -5,7 +5,6 @@ from windows import WindowManagerAbstract
 from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
 from typing import *
 from pynput import keyboard, mouse
-import time
 
 
 @final
@@ -16,21 +15,25 @@ class BotWorker(QThread):
     def __init__(self, window_manager: WindowManagerAbstract,
                  model_detection_path: str):
         super().__init__()
+        self.__HEIGTH = 736
+        self.__WIDTH = 928
+        self.__WM = window_manager
+        self.resize_window()
+
         self.__wait_condition = QWaitCondition()
         self.__mutex = QMutex()
         self.__paused = True
-        self.__HEIGTH = 960
-        self.__WIDTH = 1024
 
-        self.wm = window_manager
         self.__debug_window = False
 
         self.__model = YOLO(model_detection_path)
         self.__threshold = 0.75
-        self.__animation_time = 6
+        self.__animation_time = 3
 
         self.__mouse = mouse.Controller()
         self.__keyboard = keyboard.Controller()
+
+        self.__desired_class = set()
 
     def __draw_boxe(self, img: np.ndarray, x1: int, x2: int, y1: int, y2: int,
                     class_name: str) -> None:
@@ -69,6 +72,15 @@ class BotWorker(QThread):
                 cv2.circle(img, box_center, 10, (0, 255, 0), -1)
         self.display_image_signal.emit(img, "Pixus Debug")
 
+    def resize_window(self):
+        self.__WM.resize_window(self.__WIDTH, self.__HEIGTH)
+
+    def add_desired_class(self, class_id: int) -> None:
+        self.__desired_class.add(class_id)
+
+    def remove_desired_class(self, class_id: int) -> None:
+        self.__desired_class.remove(class_id)
+
     def debug_window_on(self):
         self.__debug_window = True
 
@@ -88,15 +100,14 @@ class BotWorker(QThread):
 
     def run(self) -> None:
         while True:
+            img = self.__WM.get_window_array()
+            results = self.__model(img)[0]
+            result_list = results.boxes.data.tolist()
+
             self.__mutex.lock()
             if self.__paused:
                 self.__wait_condition.wait(self.__mutex)
             self.__mutex.unlock()
-
-            img = self.wm.get_window_array()
-            # img = self.__resize_image(img)
-            results = self.__model(img)[0]
-            result_list = results.boxes.data.tolist()
 
             if self.__debug_window:
                 self.__debug(img, result_list, results.names)
@@ -106,10 +117,10 @@ class BotWorker(QThread):
                 if score > self.__threshold:
                     box_center = int((x1 + x2)//2), int((y1 + y2)//2)
 
-                    abs_coord = self.wm.translate_position(box_center[0], box_center[1])
+                    abs_coord = self.__WM.translate_position(box_center[0], box_center[1])
                     self.__mouse.position = abs_coord
                     self.__shift_click()
-                    time.sleep(self.__animation_time)
+                    QThread.sleep(self.__animation_time)
 
 
 
