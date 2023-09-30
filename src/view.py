@@ -20,6 +20,11 @@ class PixusView(QWidget):
 
         self.__init_ui()
 
+    def closeEvent(self, event):
+        self.__bot_worker.stop()
+        self.__bot_worker.wait()
+        event.accept()
+
     def __display_image(self, img: np.ndarray, title: str) -> None:
         cv2.imshow(title, img)
         cv2.waitKey(1)

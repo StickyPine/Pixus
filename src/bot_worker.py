@@ -18,6 +18,7 @@ class BotWorker(QThread):
         self.__HEIGTH = 736
         self.__WIDTH = 928
         self.__WM = window_manager
+        self.is_running = True
         self.resize_window()
 
         self.__wait_condition = QWaitCondition()
@@ -27,7 +28,7 @@ class BotWorker(QThread):
         self.__debug_window = False
 
         self.__model = YOLO(model_detection_path)
-        self.__threshold = 0.75
+        self.__threshold = 0.9
         self.__animation_time = 3
 
         self.__mouse = mouse.Controller()
@@ -72,6 +73,10 @@ class BotWorker(QThread):
                 cv2.circle(img, box_center, 10, (0, 255, 0), -1)
         self.display_image_signal.emit(img, "Pixus Debug")
 
+    def stop(self):
+        self.is_running = False
+        self.resume()
+        
     def resize_window(self):
         self.__WM.resize_window(self.__WIDTH, self.__HEIGTH)
 
@@ -99,7 +104,7 @@ class BotWorker(QThread):
         self.__wait_condition.wakeAll()
 
     def run(self) -> None:
-        while True:
+        while self.is_running:
             img = self.__WM.get_window_array()
             results = self.__model(img)[0]
             result_list = results.boxes.data.tolist()
