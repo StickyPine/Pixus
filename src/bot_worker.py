@@ -76,7 +76,7 @@ class BotWorker(QThread):
     def stop(self):
         self.is_running = False
         self.resume()
-        
+
     def resize_window(self):
         self.__WM.resize_window(self.__WIDTH, self.__HEIGTH)
 
@@ -126,6 +126,3 @@ class BotWorker(QThread):
                     self.__mouse.position = abs_coord
                     self.__shift_click()
                     QThread.sleep(self.__animation_time)
-
-
-
