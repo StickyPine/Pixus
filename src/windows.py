@@ -61,7 +61,7 @@ class WindowManagerX11(WindowManagerAbstract):
     def translate_position(self, x: int, y: int) -> Tuple[int, int]:
         geom = self.__window.get_geometry()
         abs_geom = self.__get_absolute_geometry(geom)
-        return abs_geom.x+x, abs_geom+y
+        return abs_geom.x+x, abs_geom.y+y
 
     def resize_window(self, width: int, height: int) -> None:
         self.__window.configure(width=width, height=height)

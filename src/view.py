@@ -54,6 +54,7 @@ class PixusView(QWidget):
             self.debug_button.setText('Debug_off')
             self.__bot_worker.debug_window_off()
 
+
 @final
 class KeyListener(QThread):
 

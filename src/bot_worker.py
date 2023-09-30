@@ -4,6 +4,8 @@ import numpy as np
 from windows import WindowManagerAbstract
 from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
 from typing import *
+from pynput import keyboard, mouse
+import time
 
 
 @final
@@ -25,6 +27,10 @@ class BotWorker(QThread):
 
         self.__model = YOLO(model_detection_path)
         self.__threshold = 0.75
+        self.__animation_time = 6
+
+        self.__mouse = mouse.Controller()
+        self.__keyboard = keyboard.Controller()
 
     def __draw_boxe(self, img: np.ndarray, x1: int, x2: int, y1: int, y2: int,
                     class_name: str) -> None:
@@ -46,6 +52,22 @@ class BotWorker(QThread):
                                           cv2.BORDER_CONSTANT, value=[0, 0, 0])
         resized_image = cv2.resize(padded_image, (self.__WIDTH, self.__HEIGTH))
         return resized_image
+
+    def __shift_click(self) -> None:
+        self.__keyboard.press(keyboard.Key.shift)
+        self.__mouse.click(mouse.Button.left, 1)
+        self.__keyboard.release(keyboard.Key.shift)
+
+    def __debug(self, img, result_list, names):
+        for result in result_list:
+            x1, y1, x2, y2, score, class_id = result
+            if score > self.__threshold:
+                class_name = names[int(class_id)]
+                box_center = int((x1 + x2)//2), int((y1 + y2)//2)
+                x1, y1, x2, y2, score, class_id = result
+                self.__draw_boxe(img, x1, x2, y1, y2, class_name)
+                cv2.circle(img, box_center, 10, (0, 255, 0), -1)
+        self.display_image_signal.emit(img, "Pixus Debug")
 
     def debug_window_on(self):
         self.__debug_window = True
@@ -72,18 +94,22 @@ class BotWorker(QThread):
             self.__mutex.unlock()
 
             img = self.wm.get_window_array()
-            img = self.__resize_image(img)
+            # img = self.__resize_image(img)
             results = self.__model(img)[0]
-
-            for result in results.boxes.data.tolist():
-                x1, y1, x2, y2, score, class_id = result
-                center_x = x2 - x1 // 2
-                center_y = y2 - y1 // 2
-                class_name = results.names[int(class_id)]
-
-                if score > self.__threshold:
-                    if self.__debug_window:
-                        self.__draw_boxe(img, x1, x2, y1, y2, class_name)
+            result_list = results.boxes.data.tolist()
 
             if self.__debug_window:
-                self.display_image_signal.emit(img, "Pixus Debug")
+                self.__debug(img, result_list, results.names)
+
+            if result_list:
+                x1, y1, x2, y2, score, class_id = result_list[0]
+                if score > self.__threshold:
+                    box_center = int((x1 + x2)//2), int((y1 + y2)//2)
+
+                    abs_coord = self.wm.translate_position(box_center[0], box_center[1])
+                    self.__mouse.position = abs_coord
+                    self.__shift_click()
+                    time.sleep(self.__animation_time)
+
+
+
