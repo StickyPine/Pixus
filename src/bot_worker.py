@@ -121,7 +121,8 @@ class BotWorker(QThread):
                 self.__debug(img, result_list, results.names)
 
             if result_list:
-                result_list = sorted(result_list, key=lambda item: item[0])
+                result_list = sorted(result_list, key=lambda item: (
+                    (item[0]**2 + item[1]**2)**(1/2)))
                 x1, y1, x2, y2, score, class_id = result_list[0]
                 if score > self.__threshold:
                     box_center = int((x1 + x2)//2), int((y1 + y2)//2)
