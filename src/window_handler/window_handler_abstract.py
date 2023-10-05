@@ -7,6 +7,7 @@ class WindowHandlerAbstract(ABC):
     """Provide an OS/WM independent window abstraction"""
 
     def __init__(self, window_name: str):
+        "find a window by the name assigned by the display server"
         self._window_name = window_name
 
     @abstractmethod
