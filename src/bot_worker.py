@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from windows import WindowManagerAbstract
+from window_handler import WindowHandlerAbstract
 from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
 from typing import *
 from pynput import keyboard, mouse
@@ -12,11 +12,15 @@ class BotWorker(QThread):
 
     display_image_signal = pyqtSignal(np.ndarray, str)
 
-    def __init__(self, window_manager: WindowManagerAbstract,
-                 model_detection_path: str):
+    def __init__(self, window_manager: WindowHandlerAbstract,
+                 ressource_model: YOLO):
         super().__init__()
-        self.__HEIGTH = 736
+        # Should be multiple of 32
+        self.__HEIGTH = 736 
         self.__WIDTH = 928
+
+        self.__ANIMATION_SLEEP = 1
+
         self.__WM = window_manager
         self.is_running = True
         self.resize_window()
@@ -27,9 +31,8 @@ class BotWorker(QThread):
 
         self.__debug_window = False
 
-        self.__model = YOLO(model_detection_path)
+        self.__ressource_model = ressource_model
         self.__threshold = 0.9
-        self.__animation_time = 3
 
         self.__mouse = mouse.Controller()
         self.__keyboard = keyboard.Controller()
@@ -106,7 +109,7 @@ class BotWorker(QThread):
     def run(self) -> None:
         while self.is_running:
             img = self.__WM.get_window_array()
-            results = self.__model(img)[0]
+            results = self.__ressource_model(img)[0]
             result_list = results.boxes.data.tolist()
 
             self.__mutex.lock()
@@ -118,6 +121,7 @@ class BotWorker(QThread):
                 self.__debug(img, result_list, results.names)
 
             if result_list:
+                result_list = sorted(result_list, key=lambda item: item[0])
                 x1, y1, x2, y2, score, class_id = result_list[0]
                 if score > self.__threshold:
                     box_center = int((x1 + x2)//2), int((y1 + y2)//2)
@@ -125,4 +129,4 @@ class BotWorker(QThread):
                     abs_coord = self.__WM.translate_position(box_center[0], box_center[1])
                     self.__mouse.position = abs_coord
                     self.__shift_click()
-                    QThread.sleep(self.__animation_time)
+                    QThread.sleep(self.__ANIMATION_SLEEP)
