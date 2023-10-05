@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from window_handler import WindowHandlerAbstract
 from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
+import time
 from typing import *
 from pynput import keyboard, mouse
 
@@ -19,7 +20,7 @@ class BotWorker(QThread):
         self.__HEIGTH = 736 
         self.__WIDTH = 928
 
-        self.__ANIMATION_SLEEP = 1
+        self.__ANIMATION_SLEEP = 1.5
 
         self.__WM = window_manager
         self.is_running = True
@@ -130,4 +131,4 @@ class BotWorker(QThread):
                     abs_coord = self.__WM.translate_position(box_center[0], box_center[1])
                     self.__mouse.position = abs_coord
                     self.__shift_click()
-                    QThread.sleep(self.__ANIMATION_SLEEP)
+                    time.sleep(self.__ANIMATION_SLEEP)
