@@ -32,7 +32,7 @@ class WindowsHandler(WindowHandlerAbstract):
                 matching_window.append(hwnd)
 
         matching_window = []
-        win32gui.EnumWindows(window_enum_callback, None)
+        win32gui.EnumWindows(window_enum_callback, None)    # loop through all windows
         if len(matching_window) == 0:
             raise ValueError(f"Window with title '{self._window_name}' not found")
         self.hwnd = matching_window[0]
@@ -44,7 +44,6 @@ class WindowsHandler(WindowHandlerAbstract):
     def resize_window(self, width: int, height: int) -> None:
         _, _, _, _, pos = win32gui.GetWindowPlacement(self.hwnd)    # get actual position
         win32gui.MoveWindow(self.hwnd, pos[0], pos[1], width + 2*self.w_border, height + 2*self.h_border + self.titlebar, True) # resize window
-        #win32gui.SetWindowPlacement(self.hwnd, None, pos[0], pos[1], width + 2*self.w_border, height + 2*self.h_border + self.titlebar, None) # keep position and update size
 
 
     def get_window_array(self) -> np.ndarray:
@@ -54,9 +53,10 @@ class WindowsHandler(WindowHandlerAbstract):
         h = bottom - top
         w = right - left
         
-        if (h != 0 and w != 0): # if window is minimized, h and w are 0
+        if (h != 0 and w != 0): # update window dims if they are not 0
             self.h = bottom - top
             self.w = right - left
+        # keep previous dims if they are 0 (window minimized)
 
         # get the window image data
         wDC = win32gui.GetWindowDC(self.hwnd)
