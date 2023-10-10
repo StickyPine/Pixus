@@ -1,8 +1,8 @@
-from window_handler_abstract import WindowHandlerAbstract
-import pygetwindow as gw
+from .window_handler_abstract import WindowHandlerAbstract
 import win32gui
 import win32con
 import win32ui
+import win32api
 import numpy as np
 from typing import *
 
@@ -13,37 +13,50 @@ class WindowsHandler(WindowHandlerAbstract):
     def __init__(self, window_title: str):
         super().__init__(window_title)
 
-        self.__window = None
         self.hwnd = None
         self.grab_window()
-        # to crop the window border and titlebar off the image
-        self.cropped_x = 8
-        self.cropped_y = 30
+
+        # window borders
+        self.w_border = win32api.GetSystemMetrics(win32con.SM_CXSIZEFRAME)
+        self.h_border = win32api.GetSystemMetrics(win32con.SM_CYSIZEFRAME)
+        self.titlebar = win32api.GetSystemMetrics(win32con.SM_CYCAPTION)
+        
+        self.h = None
+        self.w = None
 
     def grab_window(self):
-        window_names = gw.getAllTitles()
-        matching_names = [name for name in window_names if self._window_name in name]
-        if (len(matching_names) == 0):
-            raise ValueError(f"Window with title '{self._window_name}' not found.")
-        self.hwnd = win32gui.FindWindow(None, matching_names[0])
-        self.__window = gw.getWindowsWithTitle(matching_names[0])[0]
+
+        def window_enum_callback(hwnd, _):
+            window_title = win32gui.GetWindowText(hwnd)
+            if self._window_name in window_title:
+                matching_window.append(hwnd)
+
+        matching_window = []
+        win32gui.EnumWindows(window_enum_callback, None)    # loop through all windows
+        if len(matching_window) == 0:
+            raise ValueError(f"Window with title '{self._window_name}' not found")
+        self.hwnd = matching_window[0]
 
     def translate_position(self, x: int, y: int) -> Tuple[int, int]:
-        left, top, _, _ = self.__window.left, self.__window.top, self.__window.width, self.__window.height
-        return left + x + self.cropped_x, top + y + self.cropped_y
+        return win32gui.ClientToScreen(self.hwnd, (x, y))
+
 
     def resize_window(self, width: int, height: int) -> None:
-        self.__window.resizeTo(width, height)
+        _, _, _, _, pos = win32gui.GetWindowPlacement(self.hwnd)    # get actual position
+        win32gui.MoveWindow(self.hwnd, pos[0], pos[1], width + 2*self.w_border, height + 2*self.h_border + self.titlebar, True) # resize window
+
 
     def get_window_array(self) -> np.ndarray:
 
-        # get the window size
-        window_rect = win32gui.GetWindowRect(self.hwnd)
-        self.w = window_rect[2] - window_rect[0]
-        self.h = window_rect[3] - window_rect[1]
-        # account for the window border and titlebar and cut them off
-        self.w = self.w - (self.cropped_x * 2)
-        self.h = self.h - self.cropped_y - self.cropped_x
+        # get window dims
+        left, top, right, bottom = win32gui.GetClientRect(self.hwnd)
+        h = bottom - top
+        w = right - left
+        
+        if (h != 0 and w != 0): # update window dims if they are not 0
+            self.h = bottom - top
+            self.w = right - left
+        # keep previous dims if they are 0 (window minimized)
 
         # get the window image data
         wDC = win32gui.GetWindowDC(self.hwnd)
@@ -52,7 +65,7 @@ class WindowsHandler(WindowHandlerAbstract):
         dataBitMap = win32ui.CreateBitmap()
         dataBitMap.CreateCompatibleBitmap(dcObj, self.w, self.h)
         cDC.SelectObject(dataBitMap)
-        cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.cropped_x, self.cropped_y), win32con.SRCCOPY)
+        cDC.BitBlt((0, 0), (self.w, self.h), dcObj, (self.w_border, self.h_border + self.titlebar), win32con.SRCCOPY)
 
         # convert the raw data into a NumPy array
         signedIntsArray = dataBitMap.GetBitmapBits(True)
