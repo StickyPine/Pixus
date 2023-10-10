@@ -1,3 +1,4 @@
+from controller import MainViewController
 from window_handler import create_window_handler
 from bot_worker import BotWorker
 from view import PixusView
@@ -14,7 +15,7 @@ def main():
     wh = create_window_handler(win_name="Dofus", x11_name="dofus.exe")
     bot_worker = BotWorker(wh, ressource_model)
 
-    pixus = PixusView(bot_worker)
+    pixus = MainViewController(bot_worker)
     pixus.show()
     sys.exit(app.exec())
 

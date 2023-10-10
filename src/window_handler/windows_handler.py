@@ -1,4 +1,4 @@
-from window_handler_abstract import WindowHandlerAbstract
+from .window_handler_abstract import WindowHandlerAbstract
 import pygetwindow as gw
 import win32gui
 import win32con
