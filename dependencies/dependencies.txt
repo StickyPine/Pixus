@@ -1,4 +1,6 @@
 PyQt6
+pyside6
+psutil
 ultralytics
 pynput
 opencv-python
