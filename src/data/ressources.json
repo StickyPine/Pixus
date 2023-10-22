@@ -1,0 +1,434 @@
+{
+    "data": [
+        {
+            "name": "Plantes",
+            "ressources": [
+                {
+                    "id": 0,
+                    "name": "ortie",
+                    "pretty_name": "Ortie"
+                },
+                {
+                    "id": 1,
+                    "name": "sauge",
+                    "pretty_name": "Sauge"
+                },
+                {
+                    "id": 2,
+                    "name": "trefle_a_5_feuilles",
+                    "pretty_name": "Trèfle à 5 feuilles"
+                },
+                {
+                    "id": 3,
+                    "name": "menthe_sauvage",
+                    "pretty_name": "Menthe sauvage"
+                },
+                {
+                    "id": 4,
+                    "name": "orchidee_freyesque",
+                    "pretty_name": "Orchidée freyesque"
+                },
+                {
+                    "id": 5,
+                    "name": "edelweiss",
+                    "pretty_name": "Edelweiss"
+                },
+                {
+                    "id": 6,
+                    "name": "graine_de_pandouille",
+                    "pretty_name": "Graine de pandouille"
+                },
+                {
+                    "id": 7,
+                    "name": "ginseng",
+                    "pretty_name": "Ginseng"
+                },
+                {
+                    "id": 8,
+                    "name": "belladone",
+                    "pretty_name": "Belladone"
+                },
+                {
+                    "id": 9,
+                    "name": "mandragore",
+                    "pretty_name": "Mandragore"
+                },
+                {
+                    "id": 10,
+                    "name": "perce-neige",
+                    "pretty_name": "Perce-neige"
+                },
+                {
+                    "id": 11,
+                    "name": "salikrone",
+                    "pretty_name": "Salikrone"
+                }
+            ]
+        },
+        {
+            "name": "Bois",
+            "ressources": [
+                {
+                    "id": 12,
+                    "name": "frene",
+                    "pretty_name": "Frêne"
+                },
+                {
+                    "id": 13,
+                    "name": "chataignier",
+                    "pretty_name": "Châtaignier"
+                },
+                {
+                    "id": 14,
+                    "name": "bambou",
+                    "pretty_name": "Bambou"
+                },
+                {
+                    "id": 15,
+                    "name": "merisier",
+                    "pretty_name": "Merisier"
+                },
+                {
+                    "id": 16,
+                    "name": "noisetier",
+                    "pretty_name": "Noisetier"
+                },
+                {
+                    "id": 17,
+                    "name": "ebene",
+                    "pretty_name": "Ebène"
+                },
+                {
+                    "id": 18,
+                    "name": "kaliptus",
+                    "pretty_name": "Kaliptus"
+                },
+                {
+                    "id": 19,
+                    "name": "charme",
+                    "pretty_name": "Charme"
+                },
+                {
+                    "id": 20,
+                    "name": "bambou_sombre",
+                    "pretty_name": "Bambou sombre"
+                },
+                {
+                    "id": 21,
+                    "name": "orme",
+                    "pretty_name": "Orme"
+                },
+                {
+                    "id": 22,
+                    "name": "bambou_sacre",
+                    "pretty_name": "Bambou sacré"
+                },
+                {
+                    "id": 23,
+                    "name": "tremble",
+                    "pretty_name": "Tremble"
+                },
+                {
+                    "id": 24,
+                    "name": "aquajou",
+                    "pretty_name": "Aquajou"
+                },
+                {
+                    "id": 62,
+                    "name": "noyer",
+                    "pretty_name": "Noyer"
+                },
+                {
+                    "id": 63,
+                    "name": "chene",
+                    "pretty_name": "Chêne"
+                },
+                {
+                    "id": 64,
+                    "name": "bombu",
+                    "pretty_name": "Bombu"
+                },
+                {
+                    "id": 65,
+                    "name": "erable",
+                    "pretty_name": "Érable"
+                },
+                {
+                    "id": 66,
+                    "name": "oliviolet",
+                    "pretty_name": "Oliviolet"
+                },
+                {
+                    "id": 67,
+                    "name": "if",
+                    "pretty_name": "If"
+                }
+            ]
+        },
+        {
+            "name": "Minerais",
+            "ressources": [
+                {
+                    "id": 25,
+                    "name": "fer",
+                    "pretty_name": "Fer"
+                },
+                {
+                    "id": 26,
+                    "name": "cuivre",
+                    "pretty_name": "Cuivre"
+                },
+                {
+                    "id": 27,
+                    "name": "bronze",
+                    "pretty_name": "Bronze"
+                },
+                {
+                    "id": 28,
+                    "name": "kobalte",
+                    "pretty_name": "Kobalte"
+                },
+                {
+                    "id": 29,
+                    "name": "manganese",
+                    "pretty_name": "Manganèse"
+                },
+                {
+                    "id": 30,
+                    "name": "etain",
+                    "pretty_name": "Étain"
+                },
+                {
+                    "id": 31,
+                    "name": "silicate",
+                    "pretty_name": "Silicate"
+                },
+                {
+                    "id": 32,
+                    "name": "argent",
+                    "pretty_name": "Argent"
+                },
+                {
+                    "id": 33,
+                    "name": "bauxite",
+                    "pretty_name": "Bauxite"
+                },
+                {
+                    "id": 34,
+                    "name": "or",
+                    "pretty_name": "Or"
+                },
+                {
+                    "id": 35,
+                    "name": "dolomite",
+                    "pretty_name": "Dolomite"
+                },
+                {
+                    "id": 36,
+                    "name": "obsidienne",
+                    "pretty_name": "Obsidienne"
+                },
+                {
+                    "id": 37,
+                    "name": "ecume_de_mer",
+                    "pretty_name": "Écume de mer"
+                }
+            ]
+        },
+        {
+            "name": "Céréals",
+            "ressources": [
+                {
+                    "id": 38,
+                    "name": "ble",
+                    "pretty_name": "Blé"
+                },
+                {
+                    "id": 39,
+                    "name": "orge",
+                    "pretty_name": "Orge"
+                },
+                {
+                    "id": 40,
+                    "name": "avoine",
+                    "pretty_name": "Avoine"
+                },
+                {
+                    "id": 41,
+                    "name": "houblon",
+                    "pretty_name": "Houblon"
+                },
+                {
+                    "id": 42,
+                    "name": "lin",
+                    "pretty_name": "Lin"
+                },
+                {
+                    "id": 43,
+                    "name": "seigle",
+                    "pretty_name": "Seigle"
+                },
+                {
+                    "id": 44,
+                    "name": "riz",
+                    "pretty_name": "Riz"
+                },
+                {
+                    "id": 45,
+                    "name": "malt",
+                    "pretty_name": "Malt"
+                },
+                {
+                    "id": 46,
+                    "name": "chanvre",
+                    "pretty_name": "Chanvre"
+                },
+                {
+                    "id": 47,
+                    "name": "mais",
+                    "pretty_name": "Maïs"
+                },
+                {
+                    "id": 48,
+                    "name": "millet",
+                    "pretty_name": "Millet"
+                },
+                {
+                    "id": 49,
+                    "name": "frostiz",
+                    "pretty_name": "Frostiz"
+                },
+                {
+                    "id": 50,
+                    "name": "quisnoa",
+                    "pretty_name": "Quisnoa"
+                }
+            ]
+        },
+        {
+            "name": "Poissons",
+            "ressources": [
+                {
+                    "id": 51,
+                    "name": "goujon",
+                    "pretty_name": "Goujon"
+                },
+                {
+                    "id": 52,
+                    "name": "greuvette",
+                    "pretty_name": "Greuvette"
+                },
+                {
+                    "id": 53,
+                    "name": "truite",
+                    "pretty_name": "Truite"
+                },
+                {
+                    "id": 54,
+                    "name": "crabe",
+                    "pretty_name": "Crabe"
+                },
+                {
+                    "id": 55,
+                    "name": "poisson_chaton",
+                    "pretty_name": "Poisson Chaton"
+                },
+                {
+                    "id": 56,
+                    "name": "poisson_pane",
+                    "pretty_name": "Poisson Pané"
+                },
+                {
+                    "id": 57,
+                    "name": "carpe_diem",
+                    "pretty_name": "Carpe Diem"
+                },
+                {
+                    "id": 58,
+                    "name": "sardine_brillante",
+                    "pretty_name": "Sardine Brillante"
+                },
+                {
+                    "id": 59,
+                    "name": "brochet",
+                    "pretty_name": "Brochet"
+                },
+                {
+                    "id": 60,
+                    "name": "kralamoure",
+                    "pretty_name": "Kralamoure"
+                },
+                {
+                    "id": 61,
+                    "name": "anguille",
+                    "pretty_name": "Anguille"
+                },
+                {
+                    "id": 68,
+                    "name": "doracle_grise",
+                    "pretty_name": "Dorade Grise"
+                },
+                {
+                    "id": 69,
+                    "name": "perche",
+                    "pretty_name": "Perche"
+                },
+                {
+                    "id": 70,
+                    "name": "raie",
+                    "pretty_name": "Raie"
+                },
+                {
+                    "id": 71,
+                    "name": "lotte",
+                    "pretty_name": "Lotte"
+                },
+                {
+                    "id": 72,
+                    "name": "requin_marteau_faucille",
+                    "pretty_name": "Requin Marteau Faucille"
+                },
+                {
+                    "id": 73,
+                    "name": "bar_rikain",
+                    "pretty_name": "Bar Rikain"
+                },
+                {
+                    "id": 74,
+                    "name": "morue",
+                    "pretty_name": "Morue"
+                },
+                {
+                    "id": 75,
+                    "name": "tanche",
+                    "pretty_name": "Tanche"
+                },
+                {
+                    "id": 76,
+                    "name": "espadon",
+                    "pretty_name": "Espadon"
+                },
+                {
+                    "id": 77,
+                    "name": "poisskaille",
+                    "pretty_name": "Poisskaille"
+                },
+                {
+                    "id": 78,
+                    "name": "patelle",
+                    "pretty_name": "Patelle"
+                }
+            ]
+        },
+        {
+            "name": "Autre",
+            "ressources": [
+                {
+                    "id": 79,
+                    "name": "eau_potable",
+                    "pretty_name": "Eau Potable"
+                }
+            ]
+        }
+    ]
+}
