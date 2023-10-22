@@ -29,11 +29,12 @@ class MainViewController(QMainWindow):
         self.ui.BtDebug.clicked.connect(self.__toggle_debug)
         self.ui.BtResize.clicked.connect(self.__bot_worker.resize_window)
         self.ui.CBoxCateg.currentIndexChanged.connect(self.__load_category)
+        self.ui.BtEnableAll.clicked.connect(self.__enable_all)
+        self.ui.BtDisableAll.clicked.connect(self.__disable_all)
         
         # setup selection part
         self.ressources_manager = RessourcesManager()
         self.ui.CBoxCateg.addItems([cat.name for cat in self.ressources_manager.data])
-        self.ui.CBoxCateg.setStyleSheet("QComboBox QAbstractItemView { alignment: AlignCenter; }")
         self.__load_category()
         
         # other
@@ -58,6 +59,14 @@ class MainViewController(QMainWindow):
         # set col sizes
         self.ui.tableView.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)   # fill the space
         self.ui.tableView.setColumnWidth(1, 30) # fixed size
+    
+    def __enable_all(self):
+        self.ressources_manager.change_global_status(self.ui.CBoxCateg.currentText(), True)
+        self.__load_category()  # refresh the view
+    
+    def __disable_all(self):
+        self.ressources_manager.change_global_status(self.ui.CBoxCateg.currentText(), False)
+        self.__load_category()  # refresh the view
     
     def __display_image(self, img: np.ndarray, title: str) -> None:
         cv2.imshow(title, img)

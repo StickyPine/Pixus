@@ -37,11 +37,9 @@ class RessourcesManager:
             if cat.name == category:
                 return cat.ressources
         return None
-
-
-
-
-
     
-    
-
+    def change_global_status(self, active_cat: str, status: bool) -> None:
+        for cat in self.data:
+            if cat.name == active_cat:
+                for res in cat.ressources:
+                    res.enabled = status
