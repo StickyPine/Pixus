@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 from window_handler import WindowHandlerAbstract
-from PyQt6.QtCore import QThread, QWaitCondition, QMutex, pyqtSignal
+from PySide6.QtCore import QThread, QWaitCondition, QMutex, Signal
 import time
 from typing import *
 from pynput import keyboard, mouse
@@ -11,7 +11,7 @@ from pynput import keyboard, mouse
 @final
 class BotWorker(QThread):
 
-    display_image_signal = pyqtSignal(np.ndarray, str)
+    display_image_signal = Signal(np.ndarray, str)
 
     def __init__(self, window_manager: WindowHandlerAbstract,
                  ressource_model: YOLO):
