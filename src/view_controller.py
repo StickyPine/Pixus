@@ -42,7 +42,6 @@ class MainViewController(QMainWindow):
         self.__key_listener.stop_key_signal.connect(self.__toggle_start_stop)
         self.__key_listener.finished.connect(self.__key_listener.deleteLater)  # Cleanup the thread when it's finished
         self.__key_listener.start()
-        self.__key_listener.stop_key_signal.connect(self.__toggle_start_stop)
     
     def __load_category(self):
         category = self.ui.CBoxCateg.currentText()
@@ -73,7 +72,8 @@ class MainViewController(QMainWindow):
     def __disable_all(self):
         self.ressources_manager.change_global_status(self.ui.CBoxCateg.currentText(), False)
         for ressource in self.ressources_manager.get_ressources(self.ui.CBoxCateg.currentText()):
-            self.__ressource_status_changed(ressource.id, False)
+            if ressource.enabled:
+                self.__ressource_status_changed(ressource.id, False)
         self.__load_category()  # refresh the view
     
     def __display_image(self, img: np.ndarray, title: str) -> None:
