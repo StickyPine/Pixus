@@ -42,7 +42,6 @@ class MainViewController(QMainWindow):
         self.__key_listener.stop_key_signal.connect(self.__toggle_start_stop)
         self.__key_listener.finished.connect(self.__key_listener.deleteLater)  # Cleanup the thread when it's finished
         self.__key_listener.start()
-        self.__key_listener.stop_key_signal.connect(self.__toggle_start_stop)
     
     def __load_category(self):
         category = self.ui.CBoxCateg.currentText()
