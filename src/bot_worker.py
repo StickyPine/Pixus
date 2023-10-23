@@ -17,8 +17,8 @@ class BotWorker(QThread):
                  ressource_model: YOLO):
         super().__init__()
         # Should be multiple of 32
-        self.__HEIGTH = 736 
-        self.__WIDTH = 928
+        self.__HEIGTH = 768
+        self.__WIDTH = 960
 
         self.__ANIMATION_SLEEP = 1.5
 
@@ -33,7 +33,7 @@ class BotWorker(QThread):
         self.__debug_window = False
 
         self.__ressource_model = ressource_model
-        self.__threshold = 0.9
+        self.__threshold = 0.8
 
         self.__mouse = mouse.Controller()
         self.__keyboard = keyboard.Controller()
@@ -69,12 +69,15 @@ class BotWorker(QThread):
     def __debug(self, img, result_list, names):
         for result in result_list:
             x1, y1, x2, y2, score, class_id = result
-            if score > self.__threshold:
-                class_name = names[int(class_id)]
-                box_center = int((x1 + x2)//2), int((y1 + y2)//2)
-                x1, y1, x2, y2, score, class_id = result
-                self.__draw_boxe(img, x1, x2, y1, y2, class_name)
-                cv2.circle(img, box_center, 10, (0, 255, 0), -1)
+            if score < self.__threshold:
+                continue
+            if class_id not in self.__desired_class:
+                continue
+            class_name = names[int(class_id)]
+            box_center = int((x1 + x2)//2), int((y1 + y2)//2)
+            x1, y1, x2, y2, score, class_id = result
+            self.__draw_boxe(img, x1, x2, y1, y2, class_name)
+            cv2.circle(img, box_center, 10, (0, 255, 0), -1)
         self.display_image_signal.emit(img, "Pixus Debug")
 
     def stop(self):
@@ -97,14 +100,10 @@ class BotWorker(QThread):
         self.__debug_window = False
 
     def pause(self) -> None:
-        self.__mutex.lock()
         self.__paused = True
-        self.__mutex.unlock()
 
     def resume(self) -> None:
-        self.__mutex.lock()
         self.__paused = False
-        self.__mutex.unlock()
         self.__wait_condition.wakeAll()
 
     def run(self) -> None:
@@ -113,10 +112,8 @@ class BotWorker(QThread):
             results = self.__ressource_model(img)[0]
             result_list = results.boxes.data.tolist()
 
-            self.__mutex.lock()
             if self.__paused:
                 self.__wait_condition.wait(self.__mutex)
-            self.__mutex.unlock()
 
             if self.__debug_window:
                 self.__debug(img, result_list, results.names)
@@ -124,11 +121,17 @@ class BotWorker(QThread):
             if result_list:
                 result_list = sorted(result_list, key=lambda item: (
                     (item[0]**2 + item[1]**2)**(1/2)))
-                x1, y1, x2, y2, score, class_id = result_list[0]
-                if score > self.__threshold:
-                    box_center = int((x1 + x2)//2), int((y1 + y2)//2)
 
-                    abs_coord = self.__WM.translate_position(box_center[0], box_center[1])
-                    self.__mouse.position = abs_coord
-                    self.__shift_click()
-                    time.sleep(self.__ANIMATION_SLEEP)
+            for x1, y1, x2, y2, score, class_id in result_list:
+                if class_id not in self.__desired_class:
+                    continue
+                if score < self.__threshold:
+                    continue
+                box_center = int((x1 + x2)//2), int((y1 + y2)//2)
+
+                abs_coord = self.__WM.translate_position(box_center[0],
+                                                           box_center[1])
+                self.__mouse.position = abs_coord
+                self.__shift_click()
+                time.sleep(self.__ANIMATION_SLEEP)
+                break
