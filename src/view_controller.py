@@ -50,6 +50,7 @@ class MainViewController(QMainWindow):
         data = self.ressources_manager.get_ressources(category)
 
         model = CustomTableModel(data)
+        model.checkboxStateChanged.connect(self.__ressource_status_changed)
         self.ui.tableView.setModel(model)
         checkbox_delegate = CheckboxDelegate()
         self.ui.tableView.setItemDelegateForColumn(1, checkbox_delegate)  # Set the delegate for the checkbox column
@@ -60,12 +61,19 @@ class MainViewController(QMainWindow):
         self.ui.tableView.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)   # fill the space
         self.ui.tableView.setColumnWidth(1, 30) # fixed size
     
+    def __ressource_status_changed(self, id: int, enabled: bool):
+        self.__bot_worker.add_desired_class(id) if enabled else self.__bot_worker.remove_desired_class(id)
+    
     def __enable_all(self):
         self.ressources_manager.change_global_status(self.ui.CBoxCateg.currentText(), True)
+        for ressource in self.ressources_manager.get_ressources(self.ui.CBoxCateg.currentText()):
+            self.__ressource_status_changed(ressource.id, True)
         self.__load_category()  # refresh the view
     
     def __disable_all(self):
         self.ressources_manager.change_global_status(self.ui.CBoxCateg.currentText(), False)
+        for ressource in self.ressources_manager.get_ressources(self.ui.CBoxCateg.currentText()):
+            self.__ressource_status_changed(ressource.id, False)
         self.__load_category()  # refresh the view
     
     def __display_image(self, img: np.ndarray, title: str) -> None:

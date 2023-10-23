@@ -1,11 +1,13 @@
 from typing import Union
-from PySide6.QtCore import QAbstractTableModel, Qt
+from PySide6.QtCore import QAbstractTableModel, Qt, Signal
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 from PySide6.QtWidgets import QStyledItemDelegate, QCheckBox
 
 from ressources_manager import Ressource
 
 class CustomTableModel(QStandardItemModel):
+    checkboxStateChanged = Signal(int, bool)    # signal emitted when a checkbox is clicked
+    
     def __init__(self, ressources: [Ressource], parent=None):
         super(CustomTableModel, self).__init__(parent)
         self.col_names = ["Nom", "Actif"]
@@ -13,7 +15,6 @@ class CustomTableModel(QStandardItemModel):
         self.setHorizontalHeaderLabels(self.col_names)
 
         self.ressources = ressources
-        
         for ressource in ressources:
             string_item = QStandardItem(ressource.pretty_name)
             checkbox_item = QStandardItem()
@@ -28,6 +29,7 @@ class CustomTableModel(QStandardItemModel):
         if role == Qt.CheckStateRole and index.column() == 1:   # update the enabled value
             enabled = value != 0
             self.ressources[index.row()].enabled = enabled
+            self.checkboxStateChanged.emit(self.ressources[index.row()].id, enabled)    # send signal to controller
             return super().setData(index, value, Qt.CheckStateRole)
         return super().setData(index, value, role)
     
