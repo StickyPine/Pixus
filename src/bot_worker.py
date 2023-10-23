@@ -47,20 +47,7 @@ class BotWorker(QThread):
         cv2.putText(img, class_name.upper(),
                     (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX,
                     1.3, (0, 255, 0), 3, cv2.LINE_AA)
-
-    def __resize_image(self, img):
-        h, w, _ = img.shape
-        longest_edge = max(h, w)
-        top_padding = (longest_edge - h) // 2
-        bottom_padding = longest_edge - h - top_padding
-        left_padding = (longest_edge - w) // 2
-        right_padding = longest_edge - w - left_padding
-        padded_image = cv2.copyMakeBorder(img, top_padding, bottom_padding,
-                                          left_padding, right_padding,
-                                          cv2.BORDER_CONSTANT, value=[0, 0, 0])
-        resized_image = cv2.resize(padded_image, (self.__WIDTH, self.__HEIGTH))
-        return resized_image
-
+    
     def __shift_click(self) -> None:
         self.__keyboard.press(keyboard.Key.shift)
         self.__mouse.click(mouse.Button.left, 1)
