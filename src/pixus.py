@@ -1,7 +1,7 @@
 from view_controller import MainViewController
 from window_handler import create_window_handler
 from bot_worker import BotWorker
-from PyQt6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 from ultralytics import YOLO
 import sys
 
