@@ -14,6 +14,7 @@ import cv2
 class MainViewController(QMainWindow):
     def __init__(self, bot_model : BotWorker):
         super(MainViewController, self).__init__()
+        # self.setWindowTitle("Pixus") # doesn't seem to work
 
         # setup bot part
         self.__bot_worker = bot_model

@@ -15,6 +15,7 @@ def main():
     bot_worker = BotWorker(wh, ressource_model)
 
     pixus = MainViewController(bot_worker)
+    pixus.setWindowTitle("Pixus")
     pixus.show()
     sys.exit(app.exec())
 
