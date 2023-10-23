@@ -130,7 +130,7 @@ class BotWorker(QThread):
                 box_center = int((x1 + x2)//2), int((y1 + y2)//2)
 
                 abs_coord = self.__WM.translate_position(box_center[0],
-                                                           box_center[1])
+                                                         box_center[1])
                 self.__mouse.position = abs_coord
                 self.__shift_click()
                 time.sleep(self.__ANIMATION_SLEEP)
