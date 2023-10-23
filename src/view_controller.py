@@ -72,7 +72,8 @@ class MainViewController(QMainWindow):
     def __disable_all(self):
         self.ressources_manager.change_global_status(self.ui.CBoxCateg.currentText(), False)
         for ressource in self.ressources_manager.get_ressources(self.ui.CBoxCateg.currentText()):
-            self.__ressource_status_changed(ressource.id, False)
+            if ressource.enabled:
+                self.__ressource_status_changed(ressource.id, False)
         self.__load_category()  # refresh the view
     
     def __display_image(self, img: np.ndarray, title: str) -> None:
