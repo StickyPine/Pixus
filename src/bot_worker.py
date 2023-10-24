@@ -10,7 +10,6 @@ from pynput import keyboard, mouse
 
 @final
 class BotWorker(QThread):
-
     display_image_signal = Signal(np.ndarray, str)
 
     def __init__(self, window_manager: WindowHandlerAbstract,
@@ -20,8 +19,10 @@ class BotWorker(QThread):
         self.__WIN_HEIGTH = 768
         self.__WIN_WIDTH = 960
 
-        self.__RESSOURCE_WIN_WIDTH = self.__WIN_WIDTH - 100
-        self.__RESSOURCE_WIN_HEIGHT = self.__WIN_WIDTH - 100
+        self.__RESSOURCE_WIN_WIDTH = 1030
+        self.__RESSOURCE_WIN_HEIGHT = 740
+        self.__RESSOURCE_WIN_X_OFFSET = 0
+        self.__RESSOURCE_WIN_Y_OFFSET = 70
 
         self.__ANIMATION_SLEEP = 1.5
 
@@ -43,31 +44,60 @@ class BotWorker(QThread):
 
         self.__desired_class = set()
 
-    def __draw_ressource_boxe(self, img: np.ndarray, x1: int, x2: int, y1: int,
-                              y2: int, class_name: str) -> None:
-        cv2.rectangle(img, (int(x1), int(y1)),
-                      (int(x2), int(y2)), (0, 255, 0), 4)
-        cv2.putText(img, class_name.upper(),
-                    (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX,
-                    1.3, (0, 255, 0), 3, cv2.LINE_AA)
-
     def __shift_click(self) -> None:
         self.__keyboard.press(keyboard.Key.shift)
         self.__mouse.click(mouse.Button.left, 1)
         self.__keyboard.release(keyboard.Key.shift)
 
-    def __send_ressource_debug(self, img, result_list, names):
+    def __is_coord_in_ressource_win(self, x: int, y: int,
+                                    img_height: int, img_width) -> bool:
+        x_offset = (img_width - self.__RESSOURCE_WIN_WIDTH) // 2
+        y_offset = (img_height - self.__RESSOURCE_WIN_HEIGHT) // 2
+
+        x1 = x_offset + self.__RESSOURCE_WIN_X_OFFSET
+        y1 = y_offset - self.__RESSOURCE_WIN_Y_OFFSET
+        x2 = img_width - x_offset + self.__RESSOURCE_WIN_X_OFFSET
+        y2 = img_height - y_offset - self.__RESSOURCE_WIN_Y_OFFSET
+
+        if x <= x1 or x >= x2:
+            return False
+        if y <= y1 or y >= y2:
+            return False
+        return True
+
+    def __draw_ressource_window(self, img: np.ndarray) -> None:
+        img_height, img_width = img.shape[0], img.shape[1]
+        x_offset = (img_width - self.__RESSOURCE_WIN_WIDTH) // 2
+        y_offset = (img_height - self.__RESSOURCE_WIN_HEIGHT) // 2
+
+        x1 = x_offset + self.__RESSOURCE_WIN_X_OFFSET
+        y1 = y_offset - self.__RESSOURCE_WIN_Y_OFFSET
+        x2 = img_width - x_offset + self.__RESSOURCE_WIN_X_OFFSET
+        y2 = img_height - y_offset - self.__RESSOURCE_WIN_Y_OFFSET
+
+        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 3)
+
+    def __draw_ressource_boxes(self, img, result_list, names):
         for result in result_list:
             x1, y1, x2, y2, score, class_id = result
             if score < self.__threshold:
                 continue
             if class_id not in self.__desired_class:
                 continue
+
             class_name = names[int(class_id)]
             box_center = int((x1 + x2)//2), int((y1 + y2)//2)
             x1, y1, x2, y2, score, class_id = result
-            self.__draw_ressource_boxe(img, x1, x2, y1, y2, class_name)
-            cv2.circle(img, box_center, 10, (0, 255, 0), -1)
+            cv2.rectangle(img, (int(x1), int(y1)),
+                          (int(x2), int(y2)), (0, 255, 0), 3)
+            cv2.putText(img, class_name.upper(),
+                        (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX,
+                        1.3, (0, 255, 0), 3, cv2.LINE_AA)
+            cv2.circle(img, box_center, 5, (0, 255, 0), -1)
+
+    def __send_ressource_debug(self, img, result_list, names):
+        self.__draw_ressource_window(img)
+        self.__draw_ressource_boxes(img, result_list, names)
         self.display_image_signal.emit(img, "Pixus Debug")
 
     def stop(self):
@@ -118,10 +148,13 @@ class BotWorker(QThread):
                     continue
                 if score < self.__threshold:
                     continue
-                box_center = int((x1 + x2)//2), int((y1 + y2)//2)
 
-                abs_coord = self.__WM.translate_position(box_center[0],
-                                                         box_center[1])
+                c_x, c_y = (x1 + x2)//2, (y1 + y2)//2
+                img_h, img_w = img.shape[0], img.shape[1]
+                if not self.__is_coord_in_ressource_win(c_x, c_y, img_h, img_w):
+                    continue
+
+                abs_coord = self.__WM.translate_position(c_x, c_y)
                 self.__mouse.position = abs_coord
                 self.__shift_click()
                 time.sleep(self.__ANIMATION_SLEEP)
