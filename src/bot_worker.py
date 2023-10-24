@@ -17,8 +17,11 @@ class BotWorker(QThread):
                  ressource_model: YOLO):
         super().__init__()
         # Should be multiple of 32
-        self.__HEIGTH = 768
-        self.__WIDTH = 960
+        self.__WIN_HEIGTH = 768
+        self.__WIN_WIDTH = 960
+
+        self.__RESSOURCE_WIN_WIDTH = self.__WIN_WIDTH - 100
+        self.__RESSOURCE_WIN_HEIGHT = self.__WIN_WIDTH - 100
 
         self.__ANIMATION_SLEEP = 1.5
 
@@ -40,20 +43,20 @@ class BotWorker(QThread):
 
         self.__desired_class = set()
 
-    def __draw_boxe(self, img: np.ndarray, x1: int, x2: int, y1: int, y2: int,
-                    class_name: str) -> None:
+    def __draw_ressource_boxe(self, img: np.ndarray, x1: int, x2: int, y1: int,
+                              y2: int, class_name: str) -> None:
         cv2.rectangle(img, (int(x1), int(y1)),
                       (int(x2), int(y2)), (0, 255, 0), 4)
         cv2.putText(img, class_name.upper(),
                     (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX,
                     1.3, (0, 255, 0), 3, cv2.LINE_AA)
-    
+
     def __shift_click(self) -> None:
         self.__keyboard.press(keyboard.Key.shift)
         self.__mouse.click(mouse.Button.left, 1)
         self.__keyboard.release(keyboard.Key.shift)
 
-    def __debug(self, img, result_list, names):
+    def __send_ressource_debug(self, img, result_list, names):
         for result in result_list:
             x1, y1, x2, y2, score, class_id = result
             if score < self.__threshold:
@@ -63,7 +66,7 @@ class BotWorker(QThread):
             class_name = names[int(class_id)]
             box_center = int((x1 + x2)//2), int((y1 + y2)//2)
             x1, y1, x2, y2, score, class_id = result
-            self.__draw_boxe(img, x1, x2, y1, y2, class_name)
+            self.__draw_ressource_boxe(img, x1, x2, y1, y2, class_name)
             cv2.circle(img, box_center, 10, (0, 255, 0), -1)
         self.display_image_signal.emit(img, "Pixus Debug")
 
@@ -72,7 +75,7 @@ class BotWorker(QThread):
         self.resume()
 
     def resize_window(self):
-        self.__WM.resize_window(self.__WIDTH, self.__HEIGTH)
+        self.__WM.resize_window(self.__WIN_WIDTH, self.__WIN_HEIGTH)
 
     def add_desired_class(self, class_id: int) -> None:
         self.__desired_class.add(class_id)
@@ -96,6 +99,7 @@ class BotWorker(QThread):
     def run(self) -> None:
         while self.is_running:
             img = self.__WM.get_window_array()
+
             results = self.__ressource_model(img)[0]
             result_list = results.boxes.data.tolist()
 
@@ -103,7 +107,7 @@ class BotWorker(QThread):
                 self.__wait_condition.wait(self.__mutex)
 
             if self.__debug_window:
-                self.__debug(img, result_list, results.names)
+                self.__send_ressource_debug(img, result_list, results.names)
 
             if result_list:
                 result_list = sorted(result_list, key=lambda item: (
