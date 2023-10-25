@@ -40,6 +40,8 @@ class BotWorker(QThread):
         self.__mouse = mouse.Controller()
         self.__keyboard = keyboard.Controller()
 
+        self.__desired_class = set()
+
     def __shift_click(self) -> None:
         self.__keyboard.press(keyboard.Key.shift)
         self.__mouse.click(mouse.Button.left, 1)
