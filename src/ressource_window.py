@@ -16,12 +16,8 @@ class RessourceWindow:
 
     def update_window(self, img_h: int, img_w: int) -> None:
         # compute the virtual window size
-        if img_w == max(img_h, img_w):
-            win_w = (img_h*self.__RATIO_W // self.__RATIO_H) * self.__SCALE_W
-            win_h = img_h * self.__SCALE_H
-        else:
-            win_h = (img_h*self.__RATIO_W // self.__RATIO_H) * self.__SCALE_W
-            win_w = img_h * self.__SCALE_H
+        win_w = (img_h*self.__RATIO_W // self.__RATIO_H) * self.__SCALE_W
+        win_h = img_h * self.__SCALE_H
 
         # centered
         self.__top_left_x = int((img_w - win_w) // 2)
