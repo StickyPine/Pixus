@@ -1,11 +1,13 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from window_handler import WindowHandlerAbstract
 from PySide6.QtCore import QThread, QWaitCondition, QMutex, Signal
 import time
 from typing import *
 from pynput import keyboard, mouse
+
+from window_handler import WindowHandlerAbstract
+from ressource_window import RessourceWindow
 
 
 @final
@@ -13,16 +15,12 @@ class BotWorker(QThread):
     display_image_signal = Signal(np.ndarray, str)
 
     def __init__(self, window_manager: WindowHandlerAbstract,
-                 ressource_model: YOLO):
+                 ressource_window: RessourceWindow, ressource_model: YOLO):
         super().__init__()
-        # Should be multiple of 32
-        self.__WIN_HEIGTH = 768
-        self.__WIN_WIDTH = 960
-
-        self.__RESSOURCE_WIN_WIDTH = 1030
-        self.__RESSOURCE_WIN_HEIGHT = 740
-        self.__RESSOURCE_WIN_X_OFFSET = 0
-        self.__RESSOURCE_WIN_Y_OFFSET = 70
+        self.__ressource_window = ressource_window
+        self.__WIN_HEIGTH = 960
+        self.__WIN_WIDTH = (self.__WIN_HEIGTH * self.__ressource_window.ratio_w
+                            // self.__ressource_window.ratio_h)
 
         self.__ANIMATION_SLEEP = 1.5
 
@@ -42,40 +40,15 @@ class BotWorker(QThread):
         self.__mouse = mouse.Controller()
         self.__keyboard = keyboard.Controller()
 
-        self.__desired_class = set()
-
     def __shift_click(self) -> None:
         self.__keyboard.press(keyboard.Key.shift)
         self.__mouse.click(mouse.Button.left, 1)
         self.__keyboard.release(keyboard.Key.shift)
 
-    def __is_coord_in_ressource_win(self, x: int, y: int,
-                                    img_height: int, img_width) -> bool:
-        x_offset = (img_width - self.__RESSOURCE_WIN_WIDTH) // 2
-        y_offset = (img_height - self.__RESSOURCE_WIN_HEIGHT) // 2
-
-        x1 = x_offset + self.__RESSOURCE_WIN_X_OFFSET
-        y1 = y_offset - self.__RESSOURCE_WIN_Y_OFFSET
-        x2 = img_width - x_offset + self.__RESSOURCE_WIN_X_OFFSET
-        y2 = img_height - y_offset - self.__RESSOURCE_WIN_Y_OFFSET
-
-        if x <= x1 or x >= x2:
-            return False
-        if y <= y1 or y >= y2:
-            return False
-        return True
-
     def __draw_ressource_window(self, img: np.ndarray) -> None:
-        img_height, img_width = img.shape[0], img.shape[1]
-        x_offset = (img_width - self.__RESSOURCE_WIN_WIDTH) // 2
-        y_offset = (img_height - self.__RESSOURCE_WIN_HEIGHT) // 2
-
-        x1 = x_offset + self.__RESSOURCE_WIN_X_OFFSET
-        y1 = y_offset - self.__RESSOURCE_WIN_Y_OFFSET
-        x2 = img_width - x_offset + self.__RESSOURCE_WIN_X_OFFSET
-        y2 = img_height - y_offset - self.__RESSOURCE_WIN_Y_OFFSET
-
-        cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 3)
+        top_left = self.__ressource_window.top_left
+        bottom_righ = self.__ressource_window.bottom_right
+        cv2.rectangle(img, top_left, bottom_righ, (0, 0, 255), 3)
 
     def __draw_ressource_boxes(self, img, result_list, names):
         for result in result_list:
@@ -129,6 +102,8 @@ class BotWorker(QThread):
     def run(self) -> None:
         while self.is_running:
             img = self.__WM.get_window_array()
+            img_h, img_w = img.shape[:2]
+            self.__ressource_window.update_window(img_h, img_w)
 
             results = self.__ressource_model(img)[0]
             result_list = results.boxes.data.tolist()
@@ -150,8 +125,7 @@ class BotWorker(QThread):
                     continue
 
                 c_x, c_y = (x1 + x2)//2, (y1 + y2)//2
-                img_h, img_w = img.shape[0], img.shape[1]
-                if not self.__is_coord_in_ressource_win(c_x, c_y, img_h, img_w):
+                if not self.__ressource_window.is_point_in_window(c_x, c_y):
                     continue
 
                 abs_coord = self.__WM.translate_position(c_x, c_y)
